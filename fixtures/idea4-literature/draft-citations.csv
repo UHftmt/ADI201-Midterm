@@ -1,0 +1,8 @@
+cite_id,claim,source_id,quoted_text,url
+L01,The Transformer is based solely on attention mechanisms.,P-1706.03762,based solely on attention mechanisms,https://arxiv.org/abs/1706.03762
+L02,"Chain of thought prompting improves arithmetic, commonsense and symbolic reasoning.",P-2201.11903,"arithmetic, commonsense, and symbolic reasoning",https://arxiv.org/abs/2201.11903
+L03,Toolformer teaches itself to use external tools through simple APIs.,P-2302.04761,teach themselves to use external tools via simple APIs,https://arxiv.org/abs/2302.04761
+L04,Ragas evaluates RAG pipelines without reference answers.,P-2309.15217,reference-free evaluation,https://arxiv.org/abs/2309.15217
+L05,The RAG paper reports that retrieval makes models perfectly factual.,P-2005.11401,perfectly factual,https://arxiv.org/abs/2005.11401
+L06,ReAct interleaves reasoning traces and actions.,P-2210.03629,interleaved manner,https://arxiv.org/abs/2210.99999
+L07,Smith and Lee (2023) proved attention is not needed.,P-9999.00000,attention is not needed,https://arxiv.org/abs/9999.00000

@@ -1,0 +1,8 @@
+request_id,client,service_id,stylist,start
+B-001,client-a,S1,Ana,2026-11-02 09:00
+B-002,client-b,S2,Ana,2026-11-02 09:30
+B-003,client-c,S3,Ana,2026-11-02 09:45
+B-004,client-d,S1,Ben,2026-11-02 09:30
+B-005,client-e,S4,Ben,11/02/2026 10:30
+B-006,client-f,S2,Ben,2026-11-02 10:00
+B-007,client-g,S4,Ana,2026-11-02 16:45

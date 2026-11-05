@@ -1,0 +1,105 @@
+{
+  "_note": "Example format only (Idea 1 words; use YOUR idea's words from the project contract and RULES.md). Every case starts with an empty app. input is always a list of steps: create, move, list, restart (see contract section 3). expected lists only the keys you care about, taken from the LAST step: outcome, state (absent when the last step touched no item), count (after list), plus hand-computed numbers. Start your own file by copying this one and deleting the cases.",
+  "cases": [
+    {
+      "name": "happy_path_card_total",
+      "type": "happy_path",
+      "input": [
+        {
+          "do": "create",
+          "as": "customer",
+          "data": {
+            "request_id": "X-1",
+            "customer": "cust-a",
+            "item_id": "M03",
+            "qty": 1,
+            "payment_choice": "sandbox_card"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "state": "paid",
+        "total": 7.0
+      },
+      "how_computed": "1 x 7.00 = 7.00 by hand (Spring Rolls in menu-stock.csv)"
+    },
+    {
+      "name": "customer_cannot_mark_ready",
+      "type": "role_not_allowed",
+      "input": [
+        {
+          "do": "create",
+          "as": "customer",
+          "data": {
+            "request_id": "X-2",
+            "customer": "cust-a",
+            "item_id": "M03",
+            "qty": 1,
+            "payment_choice": "sandbox_card"
+          }
+        },
+        {
+          "do": "move",
+          "as": "customer",
+          "item": 1,
+          "to": "ready"
+        }
+      ],
+      "expected": {
+        "outcome": "not_permitted",
+        "state": "paid"
+      },
+      "how_computed": "Only kitchen may move paid -> in_progress -> ready (my state rules)"
+    },
+    {
+      "name": "seeded_out_of_stock",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "customer",
+          "data": {
+            "request_id": "X-3",
+            "customer": "cust-a",
+            "item_id": "M03",
+            "qty": 999,
+            "payment_choice": "sandbox_card"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "out_of_stock"
+      },
+      "how_computed": "qty 999 is more than the stock in menu-stock.csv; rejected, so no item and no state"
+    },
+    {
+      "name": "restart_keeps_order",
+      "type": "restart",
+      "input": [
+        {
+          "do": "create",
+          "as": "customer",
+          "data": {
+            "request_id": "X-4",
+            "customer": "cust-a",
+            "item_id": "M03",
+            "qty": 1,
+            "payment_choice": "sandbox_card"
+          }
+        },
+        {
+          "do": "restart"
+        },
+        {
+          "do": "list"
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "count": 1
+      },
+      "how_computed": "One order placed, so one order exists after restart"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+request_id,customer,item_id,qty,payment_choice
+R-001,cust-a,M01,2,sandbox_card
+R-002,cust-b,M03,1,pay_in_store
+R-003,cust-c,M05,3,sandbox_card
+R-004,cust-d,M02,1,pay_in_store
+R-005,cust-e,M01,1,sandbox_card
+R-001,cust-a,M01,2,sandbox_card
+R-006,cust-f,M04,1,sandbox_card
+R-007,cust-g,M02,2,pay_in_store
