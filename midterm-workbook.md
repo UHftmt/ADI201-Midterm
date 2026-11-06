@@ -33,8 +33,14 @@ Type your answers here, in your own words. Short is fine. Where a section says "
 ## Section 2: Tests first
 
 **2.1** Which fixture rows are seeded failures, and how did I find them without asking an agent to list them?
+- `B-002`: Overlaps with `B-001` (Ana, 09:00–09:45) starting at 09:30 (`conflict`).
+- `B-005`: Starts at `11/02/2026 10:30`, violating the required `YYYY-MM-DD HH:MM` format (`bad_date_format`).
+- `B-006`: Overlaps with `B-004` (Ben, 09:30–10:15) starting at 10:00 (`conflict`).
+- `B-007`: Service S4 (30 min) starts at 16:45 and ends at 17:15, which is after 17:00 closing (`after_close`).
+I found them by manually reading `RULES.md` and `services.csv`, calculating start/end times in my head for each row of `booking-requests.csv` in file order, and checking format and closing constraints.
 
 **2.2** One total or count I computed by hand, with the arithmetic: *(e.g., "Ana: 45 + 20 = 65 minutes booked")*
+Ana booked minutes: B-001 (S1 = 45 min) + B-003 (S3 = 20 min) = 45 + 20 = 65 minutes. (B-002 was rejected for conflict so it occupies 0 minutes, and B-007 was rejected for after_close).
 
 **2.3** Did my `tests:` commit come before my first build commit? Paste the two `git log --oneline` lines.
 

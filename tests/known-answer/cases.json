@@ -1,0 +1,271 @@
+{
+  "cases": [
+    {
+      "name": "happy_path_booking_and_lifecycle",
+      "type": "happy_path",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "arrived"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "completed"
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "state": "completed"
+      },
+      "how_computed": "B-001 is valid (09:00-09:45 within 09:00-17:00); staff can transition booked -> confirmed -> arrived -> completed."
+    },
+    {
+      "name": "client_cannot_confirm_booking",
+      "type": "role_not_allowed",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "client",
+          "item": 1,
+          "to": "confirmed"
+        }
+      ],
+      "expected": {
+        "outcome": "not_permitted",
+        "state": "booked"
+      },
+      "how_computed": "Only staff role can confirm an appointment; client move is rejected as not_permitted."
+    },
+    {
+      "name": "cannot_skip_states_to_completed",
+      "type": "illegal_move",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "completed"
+        }
+      ],
+      "expected": {
+        "outcome": "illegal_move",
+        "state": "booked"
+      },
+      "how_computed": "An appointment in 'booked' cannot jump directly to 'completed' without 'confirmed' and 'arrived'."
+    },
+    {
+      "name": "seeded_conflict_same_stylist_overlap",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-002",
+            "client": "client-b",
+            "service_id": "S2",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:30"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "conflict"
+      },
+      "how_computed": "B-001 takes Ana from 09:00 to 09:45; B-002 starts at 09:30 for Ana, causing an overlap."
+    },
+    {
+      "name": "seeded_bad_date_format",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-005",
+            "client": "client-e",
+            "service_id": "S4",
+            "stylist": "Ben",
+            "start": "11/02/2026 10:30"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "bad_date_format"
+      },
+      "how_computed": "Date 11/02/2026 10:30 violates the required YYYY-MM-DD HH:MM format."
+    },
+    {
+      "name": "seeded_after_close",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-007",
+            "client": "client-g",
+            "service_id": "S4",
+            "stylist": "Ana",
+            "start": "2026-11-02 16:45"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "after_close"
+      },
+      "how_computed": "Service S4 is 30 minutes; starting at 16:45 ends at 17:15, which is after 17:00 closing."
+    },
+    {
+      "name": "duplicate_request_id",
+      "type": "duplicate_request",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-alt",
+            "service_id": "S3",
+            "stylist": "Ana",
+            "start": "2026-11-02 10:00"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "duplicate_request"
+      },
+      "how_computed": "Request ID B-001 has already been used and must be rejected."
+    },
+    {
+      "name": "hand_computed_ana_booked_minutes",
+      "type": "hand_computed",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-003",
+            "client": "client-c",
+            "service_id": "S3",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:45"
+          }
+        },
+        {
+          "do": "list"
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "count": 2,
+        "ana_minutes": 65
+      },
+      "how_computed": "B-001 is S1 (45 min) + B-003 is S3 (20 min) = 65 total minutes booked for Ana."
+    },
+    {
+      "name": "restart_persists_appointments",
+      "type": "restart",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "restart"
+        },
+        {
+          "do": "list"
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "count": 1
+      },
+      "how_computed": "One booking created and saved in SQLite; after app restart, count of bookings remains 1."
+    }
+  ]
+}

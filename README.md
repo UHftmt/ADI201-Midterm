@@ -60,3 +60,4 @@ Runs the known-answer test suite and prints one `PASS` or `FAIL` line per case.
 
 ## Data-safety boundary
 All client names, stylists, and booking requests are fictional (e.g., `client-a`, stylists Ana and Ben). The reminder notification step writes to a local text file `reminders.log` instead of invoking any external SMS or email API. No real phone numbers, emails, payment cards, or external credentials are used or stored.
+
