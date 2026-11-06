@@ -266,6 +266,38 @@
         "count": 1
       },
       "how_computed": "One booking created and saved in SQLite; after app restart, count of bookings remains 1."
+    },
+    {
+      "name": "engineered_failure_stylist_conflict_repeat",
+      "type": "engineered_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-002",
+            "client": "client-b",
+            "service_id": "S2",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:30"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "conflict"
+      },
+      "how_computed": "Repeat test for engineered failure: verify that overlapping bookings for the same stylist are strictly rejected with conflict."
     }
   ]
 }

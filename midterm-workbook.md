@@ -65,8 +65,10 @@ I did not approve `pip install twilio sendgrid schedule` (row 1 of the Command D
 ## Section 4: Engineered failure
 
 **4.1** What I broke and what I predicted:
+I bypassed the stylist interval overlap check in `domain.py:create_appointment` (`if False:` instead of checking interval overlap). I predicted that submitting overlapping requests for Ana (`B-001` at 09:00 for 45 min and `B-002` at 09:30 for 90 min) would be incorrectly accepted into `booked` state instead of rejected with `conflict`, and `run.py` would output: `FAIL seeded_conflict_same_stylist_overlap: expected {'outcome': 'conflict'}, got {'outcome': 'accepted', 'state': 'booked'}`.
 
 **4.2** What happened, and was my prediction right? What did I learn?
+My prediction was 100% right: `run.py` printed that exact `FAIL` line. I learned that our known-answer suite actively protects against regression in double-booking logic. I restored the check and added a dedicated repeat test `engineered_failure_stylist_conflict_repeat` to `cases.json`, which now consistently passes.
 
 ## Section 5: Merge (Phase 2)
 
