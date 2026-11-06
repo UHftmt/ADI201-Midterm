@@ -7,4 +7,5 @@ venv/
 *.db-journal
 *.db
 *.sqlite3
+Midterm-Phase1-*.zip
 
