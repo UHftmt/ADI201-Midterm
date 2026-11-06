@@ -81,18 +81,26 @@ My prediction was 100% right: `run.py` printed that exact `FAIL` line. I learned
 ## Section 6: Presentation prep
 
 **6.1** The commit that shows my own contribution (hash and one sentence):
+`783a58b`: Added the known-answer test cases covering happy path, RBAC, state machine transitions, and seeded failures before building any code.
 
 **6.2** Pick a component I did not write. Explain in three sentences what it does and one thing that would break if it were removed:
+*(To be completed during Phase 2 after merging with teammates' components)*
 
 **6.3** If the instructor asks me to add a new state live, which three files change?
+1. `domain.py`: Add the state name to `VALID_STATES` and define its allowed moves/roles in `ALLOWED_TRANSITIONS`.
+2. `templates/staff.html`: Add UI action buttons and CSS badge rendering for the new state.
+3. `tests/known-answer/cases.json`: Add a known-answer case testing transitions into and out of the new state.
 
 ## Section 7: Reflection
 
 **7.1** One thing the agent got wrong that my known-answer tests caught:
+During the engineered failure drill, bypassing the interval comparison caused overlapping bookings to be accepted silently; my known-answer suite caught it instantly with `FAIL seeded_conflict_same_stylist_overlap`.
 
 **7.2** One thing I would do differently if I started again:
+I would define an explicit Python `Enum` for states and roles rather than string literals, providing compile-time type safety across templates and database helpers.
 
 **7.3 (required) Job link.** Name one real job task this tool maps to (for example, "a front-desk manager checks a booking for conflicts") and one thing it would still need before anyone could use it for real work (for example, real data, accounts, or a human review step):
+Real job task: A salon front-desk coordinator inspecting customer appointment intake requests, checking stylist schedules for conflicts, and confirming valid slots. One thing it still needs before real use: Secure user authentication for clients and staff, and integration with a live SMS API (e.g. Twilio) to deliver actual text reminders to customers.
 
 ## ADI501 additions (summaries)
 

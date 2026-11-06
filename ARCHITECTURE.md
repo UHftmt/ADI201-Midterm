@@ -37,7 +37,7 @@
 - State Machine & Rules: `domain.py` / `app.py`
 - Persistence: `database.py` (`appointments.db`)
 - Staff Queue: `app.py` route `/staff` rendering `templates/staff.html`
-- Fake External Step: `services/notifications.py` / `reminders.log`
+- Fake External Step: `domain.py` (`log_reminder`) / `reminders.log`
 - Human Checkpoint: `/staff` action button requiring staff confirmation
 - Known-Answer Tests: `tests/known-answer/cases.json` & `run.py`
 

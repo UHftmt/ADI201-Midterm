@@ -197,3 +197,4 @@ def list_appointments_summary(db_path):
         "count": count,
         "ana_minutes": ana_minutes
     }
+

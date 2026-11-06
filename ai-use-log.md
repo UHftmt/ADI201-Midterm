@@ -15,6 +15,7 @@
 | 3 | Nov 06 | Phase 1 Tests | Antigravity | Draft cases.json covering the 5 contract types | Proposed 9 test cases in common vocabulary | Accepted 9 cases; confirmed hand arithmetic (Ana 65m) | Checked against RULES.md, booking-requests.csv, and contract section 3 | Committed tests before build; no open problems |
 | 4 | Nov 06 | Phase 1 Plan | Antigravity | Slice planning and command authorization | Proposed 4 slices and external messaging package | Accepted 4 slices; rejected external messaging package (Twilio/SendGrid) | Verified against contract rules on sandboxing & data safety | Kept sandboxed reminders log; logged rejected command |
 | 5 | Nov 06 | Phase 1 Failure Drill | Antigravity | Engineered failure experiment on stylist conflict check | Proposed bypassing interval check in domain.py | Accepted approach; confirmed exact failure output matches prediction | Ran python3 tests/known-answer/run.py, verified failure, restored fix, added repeat test | Repeat test PASS; no open problems |
+| 6 | Nov 06 | Phase 1 Docs | Antigravity | Complete ARCHITECTURE.md, automation-leadin.md, and workbook reflection | Proposed component mapping and job link answer | Reviewed and accepted mapping | Verified file paths and state tables match app code exactly | Ready for final verification and tagging |
 
 ## Command decision table (use from Phase 1 onward)
 

@@ -85,3 +85,4 @@ def log_audit(db_path, actor, request_id, old_state, new_state, outcome):
     )
     conn.commit()
     conn.close()
+
