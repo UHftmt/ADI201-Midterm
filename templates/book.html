@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Book an Appointment{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Client Appointment Intake</h2>
+  <p style="color: #64748b; font-size: 0.95rem;">
+    Hours of operation: <strong>09:00 to 17:00</strong>. Enter start time in <code>YYYY-MM-DD HH:MM</code> format.
+  </p>
+
+  <form method="POST" action="/book">
+    <div class="form-group">
+      <label for="request_id">Booking Request ID</label>
+      <input type="text" id="request_id" name="request_id" placeholder="e.g. B-101" required value="{{ default_request_id }}">
+    </div>
+
+    <div class="form-group">
+      <label for="client">Client Name</label>
+      <input type="text" id="client" name="client" placeholder="e.g. client-a" required>
+    </div>
+
+    <div class="form-group">
+      <label for="service_id">Service</label>
+      <select id="service_id" name="service_id" required>
+        {% for s in services %}
+          <option value="{{ s.service_id }}">{{ s.name }} ({{ s.minutes }} min) — [{{ s.service_id }}]</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="stylist">Stylist / Provider</label>
+      <select id="stylist" name="stylist" required>
+        <option value="Ana">Ana</option>
+        <option value="Ben">Ben</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="start">Appointment Start Time (YYYY-MM-DD HH:MM)</label>
+      <input type="text" id="start" name="start" placeholder="2026-11-02 09:00" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 0.75rem;">Submit Booking Request</button>
+  </form>
+</div>
+{% endblock %}

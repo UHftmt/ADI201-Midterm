@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Queue & Human Checkpoint{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Front-Desk & Staff Queue</h2>
+  <p style="color: #64748b; font-size: 0.95rem;">
+    <strong>Human Checkpoint:</strong> Inspect pending intake bookings. Confirm valid bookings or cancel when necessary. Track client arrival and mark completion.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Pending Confirmation (Review Queue)</h3>
+  {% if pending %}
+    <table>
+      <thead>
+        <tr>
+          <th>Req ID</th>
+          <th>Client</th>
+          <th>Service</th>
+          <th>Stylist</th>
+          <th>Time Window</th>
+          <th>State</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in pending %}
+          <tr>
+            <td><strong>{{ a.request_id }}</strong></td>
+            <td>{{ a.client }}</td>
+            <td>{{ a.service_name }} ({{ a.minutes }}m)</td>
+            <td>{{ a.stylist }}</td>
+            <td>{{ a.start_time }} – {{ a.end_time }}</td>
+            <td><span class="badge badge-{{ a.state }}">{{ a.state }}</span></td>
+            <td>
+              <form method="POST" action="/staff/action" style="display:inline;">
+                <input type="hidden" name="appt_id" value="{{ a.id }}">
+                <input type="hidden" name="to_state" value="confirmed">
+                <button type="submit" class="btn btn-success">Confirm</button>
+              </form>
+              <form method="POST" action="/staff/action" style="display:inline;">
+                <input type="hidden" name="appt_id" value="{{ a.id }}">
+                <input type="hidden" name="to_state" value="cancelled">
+                <button type="submit" class="btn btn-danger">Cancel</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p style="color: #64748b; font-style: italic;">No pending appointments awaiting confirmation.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Active Appointments (Confirmed / Arrived)</h3>
+  {% if active %}
+    <table>
+      <thead>
+        <tr>
+          <th>Req ID</th>
+          <th>Client</th>
+          <th>Service</th>
+          <th>Stylist</th>
+          <th>Time Window</th>
+          <th>State</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in active %}
+          <tr>
+            <td><strong>{{ a.request_id }}</strong></td>
+            <td>{{ a.client }}</td>
+            <td>{{ a.service_name }} ({{ a.minutes }}m)</td>
+            <td>{{ a.stylist }}</td>
+            <td>{{ a.start_time }} – {{ a.end_time }}</td>
+            <td><span class="badge badge-{{ a.state }}">{{ a.state }}</span></td>
+            <td>
+              {% if a.state == 'confirmed' %}
+                <form method="POST" action="/staff/action" style="display:inline;">
+                  <input type="hidden" name="appt_id" value="{{ a.id }}">
+                  <input type="hidden" name="to_state" value="arrived">
+                  <button type="submit" class="btn btn-primary">Mark Arrived</button>
+                </form>
+                <form method="POST" action="/staff/action" style="display:inline;">
+                  <input type="hidden" name="appt_id" value="{{ a.id }}">
+                  <input type="hidden" name="to_state" value="no_show">
+                  <button type="submit" class="btn btn-warning">No Show</button>
+                </form>
+              {% elif a.state == 'arrived' %}
+                <form method="POST" action="/staff/action" style="display:inline;">
+                  <input type="hidden" name="appt_id" value="{{ a.id }}">
+                  <input type="hidden" name="to_state" value="completed">
+                  <button type="submit" class="btn btn-success">Complete</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p style="color: #64748b; font-style: italic;">No currently active appointments.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Completed & Cancelled History</h3>
+  {% if history %}
+    <table>
+      <thead>
+        <tr>
+          <th>Req ID</th>
+          <th>Client</th>
+          <th>Service</th>
+          <th>Stylist</th>
+          <th>Time Window</th>
+          <th>Final State</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in history %}
+          <tr>
+            <td><strong>{{ a.request_id }}</strong></td>
+            <td>{{ a.client }}</td>
+            <td>{{ a.service_name }}</td>
+            <td>{{ a.stylist }}</td>
+            <td>{{ a.start_time }} – {{ a.end_time }}</td>
+            <td><span class="badge badge-{{ a.state }}">{{ a.state }}</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p style="color: #64748b; font-style: italic;">No past appointment history.</p>
+  {% endif %}
+</div>
+{% endblock %}

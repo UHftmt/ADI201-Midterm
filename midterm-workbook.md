@@ -43,14 +43,24 @@ I found them by manually reading `RULES.md` and `services.csv`, calculating star
 Ana booked minutes: B-001 (S1 = 45 min) + B-003 (S3 = 20 min) = 45 + 20 = 65 minutes. (B-002 was rejected for conflict so it occupies 0 minutes, and B-007 was rejected for after_close).
 
 **2.3** Did my `tests:` commit come before my first build commit? Paste the two `git log --oneline` lines.
+Yes, the tests commit came directly before the first build commit:
+```text
+0c9a02c build(slice1-3): storage, validation engine, and state machine hooks
+783a58b tests: known-answer cases written before build
+```
 
 ## Section 3: Plan review
 
 **3.1** The first three slices the agent proposed, in one sentence each:
+- Slice 1: Implement SQLite schema (`services`, `appointments`, `audit_log`), load `services.csv`, and connect the runner hooks (`new_app`, `restart_app`, `do_step`) in `tests/known-answer/run.py`.
+- Slice 2: Implement validation rules to enforce opening hours (09:00–17:00), `YYYY-MM-DD HH:MM` date formatting, duplicate `request_id` detection, and stylist overlap conflict checks.
+- Slice 3: Enforce role-based access control (`client` vs `staff`) and valid state transitions (`booked` → `confirmed` → `arrived` → `completed`, plus `cancelled` and `no_show`) with audit logging.
 
 **3.2** One thing in the plan I rejected or changed, and why:
+I rejected integrating live external email/SMS APIs (such as Twilio or SendGrid) and background scheduler daemons proposed for notifications. Real sends violate the data-safety boundary in the project contract and cap the grade at 70/100, so I insisted on a sandboxed local file logger (`reminders.log`).
 
 **3.3** One command I did not approve, and the row of the command decision table that explains it:
+I did not approve `pip install twilio sendgrid schedule` (row 1 of the Command Decision Table in `ai-use-log.md`), because installing external notification SDKs introduces unnecessary internet dependencies and the risk of accidental live transmissions.
 
 ## Section 4: Engineered failure
 
