@@ -11,6 +11,8 @@ Step vocabulary (contract section 3): create, move, list, restart.
 import json
 import os
 import sys
+import tempfile
+import uuid
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -21,31 +23,57 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
+from database import init_db
+from domain import create_appointment, move_appointment, list_appointments_summary
+
+
+class AppHandle:
+    """Encapsulates the running application state and database handle."""
+    def __init__(self, db_path):
+        self.db_path = db_path
+
 
 def new_app():
-    """TODO (yours): start your app with an EMPTY data store and return a handle
-    (for example a Flask test client). Use a temporary database file or an in-memory one
-    so cases do not affect each other."""
-    raise NotImplementedError("write new_app for your app")
+    """Start app with a fresh, empty SQLite database and seeded services."""
+    temp_dir = tempfile.gettempdir()
+    db_file = os.path.join(temp_dir, f"midterm_test_{os.getpid()}_{uuid.uuid4().hex[:8]}.db")
+    if os.path.exists(db_file):
+        os.remove(db_file)
+    init_db(db_file)
+    return AppHandle(db_file)
 
 
 def restart_app(app):
-    """TODO (yours): stop and start your app on the SAME data store; return the new handle.
-    The data must still be there afterward."""
-    raise NotImplementedError("write restart_app for your app")
+    """Simulate app restart pointing to the same existing database file."""
+    # Data is persisted on disk in app.db_path
+    return AppHandle(app.db_path)
 
 
 def do_step(app, step, items):
-    """TODO (yours): perform one create / move / list step as step["as"] and return a dict
-    in the common vocabulary, for example {"outcome": "accepted", "state": "paid"} or
-    {"outcome": "out_of_stock"} (no "state": a rejected create makes no item) or
-    {"outcome": "accepted", "count": 1} for list.
+    """Perform one create / move / list step and return result in common vocabulary."""
+    action = step.get("do")
+    actor = step.get("as")
 
-    `items` is the list of item ids created so far in this case (items[0] is item 1);
-    add the new id to it when a create is accepted, so that {"do": "move", "item": 1}
-    can find it. Keys you may return: outcome, state, count, and hand-computed numbers
-    such as total (as JSON numbers, e.g. 98.5)."""
-    raise NotImplementedError("write do_step for your app")
+    if action == "create":
+        data = step.get("data", {})
+        result = create_appointment(app.db_path, actor, data)
+        if result["outcome"] == "accepted":
+            items.append(result["item_id"])
+            return {"outcome": "accepted", "state": result["state"]}
+        return {"outcome": result["outcome"]}
+
+    elif action == "move":
+        item_idx = step.get("item", 1) - 1
+        to_state = step.get("to")
+        if 0 <= item_idx < len(items):
+            appt_id = items[item_idx]
+            return move_appointment(app.db_path, actor, appt_id, to_state)
+        return {"outcome": "invalid_request"}
+
+    elif action == "list":
+        return list_appointments_summary(app.db_path)
+
+    return {"outcome": "invalid_request"}
 
 
 def run_case(case):

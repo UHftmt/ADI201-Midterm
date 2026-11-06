@@ -13,6 +13,7 @@
 | 1 | Nov 03 | 1 Setup | Antigravity | Idea 2 cut line and difficulty bar planning | Proposed core workflow, cut line with drop-first list (rescheduling screen, custom breaks), and 7 difficulty features | Accepted core; rejected complex client self-rescheduling | Checked against midterm-project-contract.md difficulty bar requirements | Kept scope tight to finish on time; no open problems |
 | 2 | Nov 06 | Phase 1 Setup | Antigravity | Review instructions, create README.md and Phase 1 roadmap | Proposed 7-step guide and draft README.md with Flask stack | Accepted Flask stack and README cut line | Verified against proposal.md and contract section 1 | Proceed to Step 2 (tests first); no open problems |
 | 3 | Nov 06 | Phase 1 Tests | Antigravity | Draft cases.json covering the 5 contract types | Proposed 9 test cases in common vocabulary | Accepted 9 cases; confirmed hand arithmetic (Ana 65m) | Checked against RULES.md, booking-requests.csv, and contract section 3 | Committed tests before build; no open problems |
+| 4 | Nov 06 | Phase 1 Plan | Antigravity | Slice planning and command authorization | Proposed 4 slices and external messaging package | Accepted 4 slices; rejected external messaging package (Twilio/SendGrid) | Verified against contract rules on sandboxing & data safety | Kept sandboxed reminders log; logged rejected command |
 
 ## Command decision table (use from Phase 1 onward)
 
@@ -20,7 +21,9 @@ Before you let an agent run a command, fill in a row. If the "Risk" cell says an
 
 | Command | Target (files or system) | Purpose | Risk | Recovery | Decision |
 |---|---|---|---|---|---|
-| *e.g., `pip install flask`* | *e.g., this project's virtual environment* | *e.g., install the web library* | *e.g., installs a package from the internet* | *e.g., delete the virtual environment folder* | *e.g., run* |
+| `pip install twilio sendgrid schedule` | Python environment / internet | Proposed external packages for customer notifications | Risk of live sends violating contract data-safety boundary | `pip uninstall` packages | **Do not run (Rejected)** |
+| `python3 tests/known-answer/run.py` | Local repository test runner | Execute known-answer test cases against application hooks | Low risk: test execution on local SQLite db | Fix failing test or code | **Run (Approved)** |
+| `git commit -m "..."` | Git repository index/history | Record verified milestones and slice commits | Low risk: standard version control | `git reset HEAD~1` if needed | **Run (Approved)** |
 
 ## Stop signs (do not run the command; ask first)
 
