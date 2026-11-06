@@ -11,6 +11,7 @@
 | # | Date | Phase | Tool / agent | Task or prompt (short) | What it proposed | I accepted / revised / rejected | How I verified | My decision and any open problem |
 |---|---|---|---|---|---|---|---|---|
 | 1 | Nov 03 | 1 Setup | Antigravity | Idea 2 cut line and difficulty bar planning | Proposed core workflow, cut line with drop-first list (rescheduling screen, custom breaks), and 7 difficulty features | Accepted core; rejected complex client self-rescheduling | Checked against midterm-project-contract.md difficulty bar requirements | Kept scope tight to finish on time; no open problems |
+| 2 | Nov 06 | Phase 1 Setup | Antigravity | Review instructions, create README.md and Phase 1 roadmap | Proposed 7-step guide and draft README.md with Flask stack | Accepted Flask stack and README cut line | Verified against proposal.md and contract section 1 | Proceed to Step 2 (tests first); no open problems |
 
 ## Command decision table (use from Phase 1 onward)
 
