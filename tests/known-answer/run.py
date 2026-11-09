@@ -78,8 +78,8 @@ def do_step(app, step):
             "no-show ": "no-show",
         }
         status = None
-        for token, value in status_map.items():
-            if suffix.strip() == token:
+        for status_name, value in status_map.items():
+            if suffix.strip() == status_name:
                 status = value
                 break
         if status is None:
