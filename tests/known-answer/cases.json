@@ -1,0 +1,68 @@
+{
+  "cases": [
+    {
+      "name": "happy_path_complete_booking",
+      "type": "happy_path",
+      "input": [
+        { "as": "customer", "action": "submit booking for Avery on 2026-11-18 at 10:00 for Consultation" },
+        { "as": "frontdesk", "action": "confirm appointment #1" },
+        { "as": "frontdesk", "action": "mark appointment #1 arrived" },
+        { "as": "frontdesk", "action": "mark appointment #1 completed" }
+      ],
+      "expected": "accepted",
+      "how_computed": "1 booking accepted, then 3 legal state moves: booked -> confirmed -> arrived -> completed; by hand"
+    },
+    {
+      "name": "illegal_status_jump_from_booked",
+      "type": "role_not_allowed",
+      "input": [
+        { "as": "customer", "action": "submit booking for Avery on 2026-11-18 at 10:00 for Consultation" },
+        { "as": "frontdesk", "action": "mark appointment #1 completed without confirming" }
+      ],
+      "expected": "not_permitted",
+      "how_computed": "Booked only allows confirmed or no-show; completed is not in the allowed set, so the move is illegal by hand"
+    },
+    {
+      "name": "same_provider_same_slot_is_rejected",
+      "type": "seeded_failure",
+      "input": [
+        { "as": "customer", "action": "submit booking for Avery on 2026-11-18 at 10:00 for Consultation" },
+        { "as": "customer", "action": "submit second booking for Avery on 2026-11-18 at 10:00 for Consultation" }
+      ],
+      "expected": "not_permitted",
+      "how_computed": "Same provider + same date + same 30-minute slot is a direct overlap; 1 request stays, 1 is rejected; by hand"
+    },
+    {
+      "name": "adjacent_slots_are_allowed",
+      "type": "happy_path",
+      "input": [
+        { "as": "customer", "action": "submit booking for Avery on 2026-11-18 at 10:00 for Consultation" },
+        { "as": "customer", "action": "submit booking for Avery on 2026-11-18 at 10:30 for Consultation" }
+      ],
+      "expected": "accepted",
+      "how_computed": "10:00 to 10:30 and 10:30 to 11:00 do not overlap; the appointments are adjacent, so both are accepted by hand"
+    },
+    {
+      "name": "no_show_keeps_slot_blocked",
+      "type": "seeded_failure",
+      "input": [
+        { "as": "customer", "action": "submit booking for Avery on 2026-11-18 at 11:00 for Consultation" },
+        { "as": "frontdesk", "action": "mark appointment #1 no-show" },
+        { "as": "customer", "action": "submit second booking for Avery on 2026-11-18 at 11:00 for Consultation" }
+      ],
+      "expected": "not_permitted",
+      "how_computed": "A no-show still occupies the provider slot for conflict checking; the second request is rejected even though the first is no-show; by hand"
+    },
+    {
+      "name": "appointment_persists_after_restart",
+      "type": "restart",
+      "input": [
+        { "as": "customer", "action": "submit booking for Avery on 2026-11-18 at 12:00 for Consultation" },
+        { "as": "system", "action": "restart the app instance" },
+        { "as": "frontdesk", "action": "view queue after restart" }
+      ],
+      "expected": "state_persists",
+      "how_computed": "1 row is created before the restart and still appears after the restart; by hand"
+    }
+  ]
+}
