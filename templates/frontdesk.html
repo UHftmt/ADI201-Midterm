@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Front desk queue · Juniper Studio{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">STAFF WORKSPACE</p>
+  <h1>Front desk queue</h1>
+  <p>Review customer requests, confirm or move bookings, and record arrival outcomes.</p>
+</section>
+<section>
+  <h2>Appointments</h2>
+  {% if appointments %}
+    <div class="card-list">
+      {% for appointment in appointments %}
+        <article class="panel appointment">
+          <div class="appointment-heading">
+            <div>
+              <span class="status">{{ appointment.status }}</span>
+              <h3>#{{ appointment.id }} · {{ appointment.customer_name }}</h3>
+            </div>
+            <p>{{ appointment.start_at }} · {{ appointment.provider }}</p>
+          </div>
+          <p>{{ appointment.service }} · 30 minutes</p>
+
+          {% if transitions[appointment.status] %}
+            <form class="inline-form" method="post"
+                  action="{{ url_for('update_status', appointment_id=appointment.id) }}">
+              <label for="status-{{ appointment.id }}">Next step</label>
+              <select id="status-{{ appointment.id }}" name="status">
+                {% for status in transitions[appointment.status] %}
+                  <option value="{{ status }}">{{ status }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit">Update status</button>
+            </form>
+          {% endif %}
+
+          {% if appointment.status in ('booked', 'confirmed') %}
+            <details>
+              <summary>Move this booking</summary>
+              <form class="inline-form move-form" method="post"
+                    action="{{ url_for('move_appointment', appointment_id=appointment.id) }}">
+                <label for="move-provider-{{ appointment.id }}">Provider</label>
+                <select id="move-provider-{{ appointment.id }}" name="provider">
+                  {% for provider in providers %}
+                    <option value="{{ provider }}" {% if provider == appointment.provider %}selected{% endif %}>{{ provider }}</option>
+                  {% endfor %}
+                </select>
+                <label for="move-date-{{ appointment.id }}">Date</label>
+                <input id="move-date-{{ appointment.id }}" type="date" name="appointment_date" required>
+                <label for="move-time-{{ appointment.id }}">Time</label>
+                <select id="move-time-{{ appointment.id }}" name="appointment_time">
+                  {% for hour in range(9, 17) %}
+                    <option value="{{ '%02d:00'|format(hour) }}">{{ '%02d:00'|format(hour) }}</option>
+                    <option value="{{ '%02d:30'|format(hour) }}">{{ '%02d:30'|format(hour) }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit">Save move</button>
+              </form>
+            </details>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No appointment requests yet. New customer requests will appear here.</p>
+  {% endif %}
+</section>
+<section>
+  <h2>Reminder log <span class="subtle">(not sent)</span></h2>
+  {% if reminders %}
+    <div class="panel table-wrap">
+      <table>
+        <thead><tr><th>Customer</th><th>Scheduled for</th><th>Logged message</th></tr></thead>
+        <tbody>
+          {% for reminder in reminders %}
+            <tr>
+              <td>{{ reminder.customer_name }}</td>
+              <td>{{ reminder.scheduled_at }}</td>
+              <td>{{ reminder.message }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty-state">Reminder entries will be recorded when bookings are created.</p>
+  {% endif %}
+</section>
+{% endblock %}

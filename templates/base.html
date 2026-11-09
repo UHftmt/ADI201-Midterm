@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Juniper Studio Appointments{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('customer') }}">Juniper Studio</a>
+    <nav aria-label="Demo role views">
+      <a href="{{ url_for('customer') }}">Customer</a>
+      <a href="{{ url_for('frontdesk') }}">Front desk</a>
+      <a href="{{ url_for('provider_schedule') }}">Provider</a>
+    </nav>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section class="messages" aria-live="polite">
+          {% for category, message in messages %}
+            <p class="message {{ category }}">{{ message }}</p>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    Demo only: these role views are not authenticated, and reminder messages are logged, never sent.
+  </footer>
+</body>
+</html>
