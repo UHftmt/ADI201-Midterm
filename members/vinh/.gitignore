@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+*.db-journal
+*.db
+*.sqlite3
+
+salon.db
+outbox/

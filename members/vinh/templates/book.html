@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Book an appointment{% endblock %}
+{% block heading %}Client: book an appointment{% endblock %}
+{% block content %}
+<form method="post" action="{{ url_for('book_form') }}">
+  <label>Request id <input name="request_id">
+    <span class="hint">any new id of your own; using the same id twice is refused</span></label>
+  <label>Your name <input name="client"></label>
+  <label>Service
+    <select name="service_id">
+      {% for service_id, service in services.items() %}
+      <option value="{{ service_id }}">{{ service.name }} ({{ service.minutes }} minutes)</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Stylist
+    <select name="stylist">
+      {% for stylist in stylists %}
+      <option value="{{ stylist }}">{{ stylist }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Start <input name="start" placeholder="YYYY-MM-DD HH:MM">
+    <span class="hint">write it as YYYY-MM-DD HH:MM; the salon is open 09:00 to 17:00</span></label>
+  <button type="submit">Ask for this appointment</button>
+</form>
+
+<h2>Bookings</h2>
+{% if bookings %}
+<table>
+  <tr><th>#</th><th>Client</th><th>Service</th><th>Stylist</th><th>Start to end</th><th>State</th><th>What you can do</th></tr>
+  {% for b in bookings %}
+  <tr>
+    <td>{{ b.id }}</td>
+    <td>{{ b.client }}</td>
+    <td>{{ services[b.service_id].name }}</td>
+    <td>{{ b.stylist }}</td>
+    <td>{{ b.start }} to {{ b.end }}</td>
+    <td><code>{{ b.state }}</code> ({{ state_text[b.state] }})</td>
+    <td>
+      {# One button for each move the rules allow a client from this state. #}
+      {% for to in moves_for(b.state, 'client') %}
+      <form class="inline" method="post" action="{{ url_for('move_form', booking_id=b.id) }}">
+        <input type="hidden" name="role" value="client">
+        <input type="hidden" name="to" value="{{ to }}">
+        <button type="submit">{{ button_text[to] }}</button>
+      </form>
+      {% else %}
+      nothing
+      {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>No bookings yet.</p>
+{% endif %}
+{% endblock %}

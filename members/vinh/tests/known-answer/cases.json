@@ -1,0 +1,623 @@
+{
+  "cases": [
+    {
+      "name": "happy_path_full_visit",
+      "type": "happy_path",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "arrived"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "completed"
+        }
+      ],
+      "expected": {
+        "outcome": "illegal_move",
+        "state": "confirmed"
+      },
+      "how_computed": "9:00am + 45m = 9:45am"
+    },
+    {
+      "name": "client_cannot_confirm",
+      "type": "role_not_allowed",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "client",
+          "item": 1,
+          "to": "confirmed"
+        }
+      ],
+      "expected": {
+        "outcome": "duplicate_request",
+        "state": "confirmed"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "client_cannot_mark_arrived",
+      "type": "role_not_allowed",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "move",
+          "as": "client",
+          "item": 1,
+          "to": "arrived"
+        }
+      ],
+      "expected": {
+        "outcome": "not_permitted",
+        "state": "arrived"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "client_cannot_mark_no_show",
+      "type": "role_not_allowed",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "move",
+          "as": "client",
+          "item": 1,
+          "to": "no_show"
+        }
+      ],
+      "expected": {
+        "outcome": "not_permitted",
+        "state": "no_show"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "client_cannot_mark_completed",
+      "type": "role_not_allowed",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "arrived"
+        },
+        {
+          "do": "move",
+          "as": "client",
+          "item": 1,
+          "to": "completed"
+        }
+      ],
+      "expected": {
+        "outcome": "not_permitted",
+        "state": "completed"
+      },
+      "how_computed": "Because only the staff can mark complete because the staff is the one in charge for that."
+    },
+    {
+      "name": "client_can_cancel_own_booking",
+      "type": "happy_path",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "client",
+          "item": 1,
+          "to": "cancelled"
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "state": "cancelled"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "staff_marks_no_show",
+      "type": "happy_path",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "no_show"
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "state": "no_show"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "staff_cannot_skip_to_completed",
+      "type": "illegal_move",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "completed"
+        }
+      ],
+      "expected": {
+        "outcome": "not_permitted"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "completed_cannot_be_cancelled",
+      "type": "illegal_move",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "arrived"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "completed"
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "cancelled"
+        }
+      ],
+      "expected": {
+        "outcome": "illegal_move"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "duplicate_request_id",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-b",
+            "service_id": "S3",
+            "stylist": "Ben",
+            "start": "2026-11-03 13:00"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "duplicate_request"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "back_to_back_is_not_a_conflict",
+      "type": "boundary",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-2",
+            "client": "client-b",
+            "service_id": "S3",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:45"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "state": "booked"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "ends_exactly_at_close",
+      "type": "boundary",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S4",
+            "stylist": "Ben",
+            "start": "2026-11-03 16:30"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "state": "booked"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "seeded_bad_date_format",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-007",
+            "client": "client-g",
+            "service_id": "S4",
+            "stylist": "Ana",
+            "start": "2026-11-02 16:45"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "after_close"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "seeded_after_close",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-007",
+            "client": "client-g",
+            "service_id": "S4",
+            "stylist": "Ana",
+            "start": "2026-11-02 16:45"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "after_close"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "seeded_conflict_ana",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-002",
+            "client": "client-b",
+            "service_id": "S2",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:30"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-003",
+            "client": "client-c",
+            "service_id": "S3",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:45"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "conflict"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "seeded_conflict_ben",
+      "type": "seeded_failure",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-006",
+            "client": "client-f",
+            "service_id": "S2",
+            "stylist": "Ben",
+            "start": "2026-11-02 10:00"
+          }
+        }
+      ],
+      "expected": {
+        "outcome": "conflict"
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "whole_fixture_count_and_minutes",
+      "type": "hand_total",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-001",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-002",
+            "client": "client-b",
+            "service_id": "S2",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:30"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-003",
+            "client": "client-c",
+            "service_id": "S3",
+            "stylist": "Ana",
+            "start": "2026-11-02 09:45"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-004",
+            "client": "client-d",
+            "service_id": "S1",
+            "stylist": "Ben",
+            "start": "2026-11-02 09:30"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-005",
+            "client": "client-e",
+            "service_id": "S4",
+            "stylist": "Ben",
+            "start": "11/02/2026 10:30"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-006",
+            "client": "client-f",
+            "service_id": "S2",
+            "stylist": "Ben",
+            "start": "2026-11-02 10:00"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "B-007",
+            "client": "client-g",
+            "service_id": "S4",
+            "stylist": "Ana",
+            "start": "2026-11-02 16:45"
+          }
+        },
+        {
+          "do": "list"
+        }
+      ],
+      "expected": {
+        "outcome": "",
+        "count": 7,
+        "ana_minutes": 2,
+        "ben_minutes": 2
+      },
+      "how_computed": ""
+    },
+    {
+      "name": "restart_keeps_bookings_and_state",
+      "type": "restart",
+      "input": [
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
+            "request_id": "V-1",
+            "client": "client-a",
+            "service_id": "S1",
+            "stylist": "Ana",
+            "start": "2026-11-03 09:00"
+          }
+        },
+        {
+          "do": "move",
+          "as": "staff",
+          "item": 1,
+          "to": "confirmed"
+        },
+        {
+          "do": "restart"
+        },
+        {
+          "do": "list"
+        }
+      ],
+      "expected": {
+        "outcome": "accepted",
+        "count": 1
+      },
+      "how_computed": ""
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Front-desk queue{% endblock %}
+{% block heading %}Front desk: booking queue{% endblock %}
+{% block content %}
+<p>A new booking stays <code>booked</code> until someone here presses Confirm.</p>
+
+<h2>Bookings ({{ summary.count }} in total)</h2>
+{% if bookings %}
+<table>
+  <tr><th>#</th><th>Client</th><th>Service</th><th>Stylist</th><th>Start to end</th><th>State</th><th>What you can do</th></tr>
+  {% for b in bookings %}
+  <tr>
+    <td>{{ b.id }}</td>
+    <td>{{ b.client }}</td>
+    <td>{{ services[b.service_id].name }} ({{ b.minutes }} minutes)</td>
+    <td>{{ b.stylist }}</td>
+    <td>{{ b.start }} to {{ b.end }}</td>
+    <td><code>{{ b.state }}</code> ({{ state_text[b.state] }})</td>
+    <td>
+      {# One button for each move the rules allow staff from this state. #}
+      {% for to in moves_for(b.state, 'staff') %}
+      <form class="inline" method="post" action="{{ url_for('move_form', booking_id=b.id) }}">
+        <input type="hidden" name="role" value="staff">
+        <input type="hidden" name="to" value="{{ to }}">
+        <button type="submit">{{ button_text[to] }}</button>
+      </form>
+      {% endfor %}
+      {% if b.state in remind_states %}
+      <form class="inline" method="post" action="{{ url_for('remind', booking_id=b.id) }}">
+        <button type="submit">Send reminder</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>No bookings yet.</p>
+{% endif %}
+
+<h2>Minutes per stylist</h2>
+<p class="hint">Every stored booking counts here, whatever its state.</p>
+{% if summary.minutes_by_stylist %}
+<table>
+  <tr><th>Stylist</th><th>Total minutes</th></tr>
+  {% for stylist, minutes in summary.minutes_by_stylist.items() %}
+  <tr><td>{{ stylist }}</td><td>{{ minutes }}</td></tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Nothing to add up yet.</p>
+{% endif %}
+{% endblock %}
