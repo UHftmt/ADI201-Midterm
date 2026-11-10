@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block heading %}Front desk: history of every action{% endblock %}
+{% block content %}
+<p>Newest first. Rejected attempts are listed too, with the reason word in the last column.</p>
+{% if rows %}
+<table>
+  <tr><th>Time</th><th>Who</th><th>Action</th><th>Request id</th><th>Booking #</th><th>Old state</th><th>New state</th><th>Outcome</th></tr>
+  {% for r in rows %}
+  <tr>
+    <td>{{ r.at }}</td>
+    <td>{{ r.actor }}</td>
+    <td>{{ r.action }}</td>
+    <td>{{ r.request_id or '' }}</td>
+    <td>{{ r.booking_id or '' }}</td>
+    <td>{{ r.old_state or '' }}</td>
+    <td>{{ r.new_state or '' }}</td>
+    <td><code>{{ r.outcome }}</code> ({{ 'accepted' if r.outcome == 'accepted' else 'rejected: ' ~ outcome_text.get(r.outcome, '') }})</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Nothing has happened yet.</p>
+{% endif %}
+{% endblock %}

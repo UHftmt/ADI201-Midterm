@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<p>A made-up salon. Pick who you are. There are no accounts: the page you use is your role.</p>
+<ul>
+  <li><a href="{{ url_for('book_page') }}">I am a client</a>: ask for an appointment or cancel one.</li>
+  <li><a href="{{ url_for('staff_page') }}">I am the front desk</a>: see every booking and move it along.</li>
+  <li><a href="{{ url_for('history_page') }}">History</a>: every action that was tried, accepted or rejected.</li>
+</ul>
+{% endblock %}

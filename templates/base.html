@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Salon Appointment Desk{% endblock %}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 60rem; margin: 1rem auto; padding: 0 1rem; line-height: 1.4; color: #222; }
+    nav a { margin-right: 1rem; }
+    table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1.5rem; }
+    th, td { border: 1px solid #bbb; padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+    th { background: #eee; }
+    label { display: block; margin: 0.5rem 0; }
+    form.inline { display: inline; }
+    code { background: #f0f0f0; padding: 0 0.2rem; }
+    .result { border: 2px solid #999; padding: 0.5rem 0.75rem; margin: 1rem 0; }
+    .result.ok { border-color: #2a7a2a; }
+    .result.no { border-color: #b03030; }
+    .hint { color: #555; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('book_page') }}">Client: book</a>
+    <a href="{{ url_for('staff_page') }}">Front desk: queue</a>
+    <a href="{{ url_for('history_page') }}">Front desk: history</a>
+  </nav>
+  <h1>{% block heading %}Salon Appointment Desk{% endblock %}</h1>
+
+  {# The result of the last action: the contract word plus one plain sentence. #}
+  {% if outcome %}
+  <p class="result {{ 'ok' if outcome in ['accepted', 'reminder_written'] else 'no' }}">
+    {% if outcome == 'accepted' %}Accepted{% elif outcome == 'reminder_written' %}Reminder written{% else %}Rejected{% endif %}
+    (<code>{{ outcome }}</code>):
+    {{ outcome_text.get(outcome, 'Unknown result word.') }}
+  </p>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</body>
+</html>
