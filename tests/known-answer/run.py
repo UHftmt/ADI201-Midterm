@@ -8,9 +8,11 @@ common words from the project contract inside the hooks.
 
 Step vocabulary (contract section 3): create, move, list, restart.
 """
+import atexit
 import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -22,30 +24,95 @@ sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
 
+# ---- the three hooks: how run.py drives the salon app ----------------------
+#
+# MAPPING (my words -> contract common words). It is one-to-one: the app
+# already uses the contract's words, so the hooks translate nothing.
+#
+#   states     booked, confirmed, arrived, completed, no_show, cancelled
+#              -> the same six words
+#   outcomes   accepted, bad_date_format, after_close, conflict,
+#              duplicate_request, not_permitted, illegal_move
+#              -> the same seven words
+#   roles      client, staff -> the same two words
+#
+# Extra internal outcome words that are NOT contract words (no case should
+# expect them; they only appear when the input itself is broken):
+#   missing_field    a create with an empty request_id, client, service_id or stylist
+#   unknown_service  a create whose service_id is not in services.csv
+#   not_found        a move on an item number that does not exist
+#
+# Every step goes through the JSON API in app.py (/api/bookings...), which
+# calls the same Store methods as the /book and /staff pages.
+
+_TEMP_DIRS = []  # one temporary folder per case, all removed when run.py ends
+
+
+def _cleanup():
+    for d in _TEMP_DIRS:
+        d.cleanup()
+
+
+atexit.register(_cleanup)
+
+
+def _start(db_path):
+    """Build a brand-new Flask app on this database file and return a handle."""
+    from app import create_app
+    return {"client": create_app(db_path).test_client(), "db_path": db_path}
+
+
 def new_app():
-    """TODO (yours): start your app with an EMPTY data store and return a handle
-    (for example a Flask test client). Use a temporary database file or an in-memory one
-    so cases do not affect each other."""
-    raise NotImplementedError("write new_app for your app")
+    """A fresh app with an EMPTY data store: a new database file in a new temporary folder."""
+    folder = tempfile.TemporaryDirectory(prefix="salon-known-answer-")
+    _TEMP_DIRS.append(folder)
+    return _start(os.path.join(folder.name, "salon.db"))
 
 
 def restart_app(app):
-    """TODO (yours): stop and start your app on the SAME data store; return the new handle.
-    The data must still be there afterward."""
-    raise NotImplementedError("write restart_app for your app")
+    """Throw the old app away and build a new one on the SAME database file."""
+    db_path = app["db_path"]
+    app.clear()  # the old Flask app and its test client are dropped here
+    return _start(db_path)
 
 
 def do_step(app, step, items):
-    """TODO (yours): perform one create / move / list step as step["as"] and return a dict
-    in the common vocabulary, for example {"outcome": "accepted", "state": "paid"} or
-    {"outcome": "out_of_stock"} (no "state": a rejected create makes no item) or
-    {"outcome": "accepted", "count": 1} for list.
+    """Perform one create / move / list step through the JSON API and return
+    the result in the contract's common words (see MAPPING above)."""
+    client = app["client"]
+    do = step["do"]
 
-    `items` is the list of item ids created so far in this case (items[0] is item 1);
-    add the new id to it when a create is accepted, so that {"do": "move", "item": 1}
-    can find it. Keys you may return: outcome, state, count, and hand-computed numbers
-    such as total (as JSON numbers, e.g. 98.5)."""
-    raise NotImplementedError("write do_step for your app")
+    if do == "create":
+        reply = client.post("/api/bookings",
+                            json={"role": step["as"], "data": step["data"]}).get_json()
+        if reply["outcome"] != "accepted":
+            return {"outcome": reply["outcome"]}  # a rejected create makes no item
+        items.append(reply["id"])
+        return {"outcome": reply["outcome"], "state": reply["state"]}
+
+    if do == "move":
+        number = step["item"]  # 1-based: item 1 is items[0]
+        if not isinstance(number, int) or number < 1 or number > len(items):
+            # The case points at an item that was never created
+            # (for example its create was rejected).
+            return {"outcome": "not_found"}
+        reply = client.post(f"/api/bookings/{items[number - 1]}/move",
+                            json={"role": step["as"], "to": step["to"]}).get_json()
+        if "state" not in reply:
+            return {"outcome": reply["outcome"]}
+        return {"outcome": reply["outcome"], "state": reply["state"]}
+
+    if do == "list":
+        reply = client.get("/api/bookings").get_json()
+        minutes = reply["minutes_by_stylist"]
+        return {
+            "outcome": reply["outcome"],
+            "count": reply["count"],
+            "ana_minutes": minutes.get("Ana", 0),
+            "ben_minutes": minutes.get("Ben", 0),
+        }
+
+    raise ValueError(f"unknown step: {do!r}")
 
 
 def run_case(case):

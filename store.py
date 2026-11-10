@@ -68,6 +68,11 @@ class Store:
         )
         self.db.commit()
 
+    def log_event(self, actor, action, booking_id, request_id, old_state, new_state, outcome):
+        """Write one history row for an action that happens outside the Store
+        (for example a reminder, which app.py writes to the outbox file)."""
+        self._log(booking_id, request_id, actor, action, old_state, new_state, outcome)
+
     def _reject_create(self, request_id, role, outcome):
         """A rejected create: no booking is stored, only the history row."""
         self._log(None, request_id, role, "create", None, None, outcome)

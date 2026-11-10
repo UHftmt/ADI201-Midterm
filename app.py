@@ -164,6 +164,13 @@ def create_app(db_path=None):
             with open(reminders_log, "a", encoding="utf-8") as f:
                 f.write(line + "\n")
             outcome = "reminder_written"
+        # Every reminder attempt, written or refused, gets one history row.
+        # A reminder never changes the state, so old and new state are equal.
+        if booking is None:
+            get_store().log_event("staff", "remind", None, None, None, None, outcome)
+        else:
+            get_store().log_event("staff", "remind", booking["id"], booking["request_id"],
+                                  booking["state"], booking["state"], outcome)
         return redirect(url_for("staff_page", outcome=outcome))
 
     # ---- JSON API (used by tests/known-answer/run.py) -------------------
