@@ -8,9 +8,9 @@
 | Tool | Command I ran | What it printed (copy exactly) | Status (working / missing) | If missing: what I will do and by when |
 |---|---|---|---|---|
 | *e.g., Python 3* | *e.g., `python3 --version`* | *e.g., `Python 3.11.7`* | *e.g., working* | *e.g., none needed* |
-| Python 3 | | | | |
-| Git | | | | |
-| Agent (agy or Codex) | | | | |
+| Python 3 | `python3 --version` | `Python 3.12.8` | working | none needed |
+| Git | `git --version` | `git version 2.54.0 (Apple Git-157)` | working | none needed |
+| Agent (Claude Code; I use it instead of agy or Codex) | `claude --version` | `2.1.257 (Claude Code)` | working | none needed |
 
 ## Credential rule (read before you continue)
 

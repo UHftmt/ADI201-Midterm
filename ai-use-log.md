@@ -10,8 +10,9 @@
 
 | # | Date | Phase | Tool / agent | Task or prompt (short) | What it proposed | I accepted / revised / rejected | How I verified | My decision and any open problem |
 |---|---|---|---|---|---|---|---|---|
-| 1 | *e.g., Oct 21* | *e.g., 0 Proposal* | *e.g., Codex* | *e.g., "Critique my cut line for the ordering idea"* | *e.g., Suggested adding loyalty points* | *e.g., Rejected* | *e.g., Checked against the difficulty bar: loyalty points are not required and add risk* | *e.g., Kept my cut line; no open problem* |
-| 2 | *e.g., Oct 21* | *e.g., 0 Proposal* | *e.g., agy* | *e.g., "What is a state machine? Explain with an order."* | *e.g., An explanation with 5 states* | *e.g., Revised* | *e.g., Redrew the states myself and compared with the explanation* | *e.g., I use 5 states, and I wrote the allowed moves myself* |
+| 1 | Nov 9 | 1 Setup | Claude Code | "Set up my repository from the starter as Step 1.1 says" | Copied the contract files, templates and Idea 2 fixtures into `midterm-vinh/` and made the setup commit | Accepted | `git log --oneline` shows one commit; compared the file list with Step 1.1 | Kept. It also copied the merge and presentation checklists, which Step 1.1 does not list; harmless |
+| 2 | Nov 9 | 1 Cut line | Claude Code | "Draft my README cut line, Difficulty Bar table and state rules" | A cut line, seven feature rows, three menu items, a who-may-move-what table | TO DECIDE (Vinh) | TO DO: read each row against the contract and RULES.md | TO DO |
+| 3 | Nov 9 | 1 Tests first | Claude Code | "Write my cases.json" | It declined to write expected values, because Step 1.3 says an agent may not produce them; it gave me a worksheet with the steps filled in and the answers blank | Accepted | Read Step 1.3 in START-HERE.html | I fill in every `expected` and `how_computed` myself |
 
 ## Command decision table (use from Phase 1 onward)
 
