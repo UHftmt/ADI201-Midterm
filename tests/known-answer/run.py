@@ -10,6 +10,7 @@ Step vocabulary (contract section 3): create, move, list, restart.
 """
 import json
 import os
+import re
 import sys
 import tempfile
 import uuid
@@ -49,6 +50,73 @@ def restart_app(app):
     return AppHandle(app.db_path)
 
 
+SHIMING_ROLE_MAP = {
+    "customer": "client",
+    "frontdesk": "staff",
+}
+
+SHIMING_SERVICE_MAP = {
+    "Consultation": "S4",       # 30 minutes
+    "Cut and style": "S1",      # 45 minutes
+    "Color consultation": "S2", # 90 minutes
+}
+
+
+def translate_step(step, step_index):
+    """Translate non-contract step syntax (e.g., Shiming's action prose) into contract steps."""
+    if "do" in step:
+        return step
+
+    as_role = step.get("as", "")
+    actor = SHIMING_ROLE_MAP.get(as_role, as_role)
+    action = step.get("action", "")
+
+    if as_role == "customer":
+        match = re.search(
+            r"submit(?: second)? booking for (.+?) on (\d{4}-\d{2}-\d{2}) at (\d{2}:\d{2}) for (.+)",
+            action,
+        )
+        if not match:
+            raise ValueError(f"Unrecognized customer action: {action!r}")
+        provider, appointment_date, appointment_time, service = match.groups()
+        client_name = "Second Customer" if "second" in action.lower() else "Sam Example"
+        return {
+            "do": "create",
+            "as": actor,
+            "data": {
+                "request_id": f"SHIMING-{step_index}",
+                "client": client_name,
+                "service_id": SHIMING_SERVICE_MAP.get(service, service),
+                "stylist": provider,
+                "start": f"{appointment_date} {appointment_time}",
+            },
+        }
+
+    if as_role == "frontdesk":
+        if "view queue" in action.lower():
+            return {"do": "list"}
+        match = re.search(r"(?:confirm|mark) appointment #(\d+)(?: |$)(.*)", action)
+        if not match:
+            raise ValueError(f"Unrecognized frontdesk action: {action!r}")
+        item_num = int(match.group(1))
+        if "confirm appointment" in action:
+            to_state = "confirmed"
+        elif "arrived" in action:
+            to_state = "arrived"
+        elif "completed" in action:
+            to_state = "completed"
+        elif "no-show" in action:
+            to_state = "no_show"
+        else:
+            raise ValueError(f"Unable to map target state for: {action!r}")
+        return {"do": "move", "as": actor, "item": item_num, "to": to_state}
+
+    if as_role == "system" and "restart" in action.lower():
+        return {"do": "restart"}
+
+    raise ValueError(f"Unrecognized step format: {step!r}")
+
+
 def do_step(app, step, items):
     """Perform one create / move / list step and return result in common vocabulary."""
     action = step.get("do")
@@ -81,7 +149,8 @@ def run_case(case):
     app = new_app()
     items = []
     result = {}
-    for step in case["input"]:
+    for idx, raw_step in enumerate(case["input"], start=1):
+        step = translate_step(raw_step, idx)
         if step["do"] == "restart":
             app = restart_app(app)
             result = {"outcome": "accepted"}
@@ -94,6 +163,14 @@ def matches(got, expected):
     """expected may list only some keys; every key you list must match."""
     if isinstance(expected, dict) and isinstance(got, dict):
         return all(k in got and got[k] == v for k, v in expected.items())
+    # Shiming's cases use string expectations mapped to common outcomes here.
+    if isinstance(expected, str) and isinstance(got, dict):
+        if expected == "accepted":
+            return got.get("outcome") == "accepted"
+        if expected == "not_permitted":
+            return got.get("outcome") in {"not_permitted", "illegal_move", "conflict"}
+        if expected == "state_persists":
+            return got.get("outcome") == "accepted" and got.get("count", 0) >= 1
     return got == expected
 
 
