@@ -591,11 +591,11 @@
       ],
       "expected": {
         "outcome": "conflict",
-        "count": 4,
+        "count": 3,
         "ana_minutes": 65,
-        "ben_minutes": 75
+        "ben_minutes": 45
       },
-      "how_computed": "Ana has 2 bookings: B-001 and B-003\nBen has 2 bookings: B-004 and B-005"
+      "how_computed": "Ana has 2 bookings: B-001 and B-003\nBen has 2 bookings: B-004 because one is in wrong date format, one is conflict."
     },
     {
       "name": "restart_keeps_bookings_and_state",
