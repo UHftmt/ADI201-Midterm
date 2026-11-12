@@ -30,7 +30,7 @@ Write your prediction **before** running. A case that fails only because a compo
 | Vinh | `seeded_after_close` | PASS | PASS | PASS | PASS | *(none)* |
 | Vinh | `seeded_conflict_ana` | PASS | PASS | PASS | PASS | *(none)* |
 | Vinh | `seeded_conflict_ben` | PASS *(at `phase1-submit-vinh`; first answers in `2051420` failed)* | FAIL *(same Phase 1 test-setup omission in `cases.json`)* | FAIL *(got `accepted`, `booked`)* | PASS | `6057acb` (Vinh re-worked his own answers by hand; replaces `39dde4c`) |
-| Vinh | `whole_fixture_count_and_minutes` | FAIL *(at `phase1-submit-vinh`: outcome only, Vinh `conflict`, app `accepted`)* | FAIL *(base missing `ben_minutes` component + Phase 1 answer-key error)* | FAIL *(got `accepted`, `3`, `65`; no `ben_minutes`)* | PASS | `68899a7` (ben_minutes port) + `6057acb` (Vinh's own answers) + `aef6a66` (Vinh changed the outcome to `accepted`) |
+| Vinh | `whole_fixture_count_and_minutes` | PASS *(at `phase1-submit-vinh`; first answers in `2051420` failed)* | FAIL *(base missing `ben_minutes` component + Phase 1 answer-key error)* | FAIL *(got `accepted`, `3`, `65`; no `ben_minutes`)* | PASS | `68899a7` (ben_minutes port) + `6057acb` (Vinh's own answers) + `aef6a66` (Vinh changed the outcome to `accepted`) |
 | Vinh | `restart_keeps_bookings_and_state` | PASS | PASS | PASS | PASS | *(none)* |
 | Shiming | `happy_path_complete_booking` | PASS | PASS *(via `run.py` Step 2 translator)* | PASS | PASS | `8099227` (step translator) |
 | Shiming | `illegal_status_jump_from_booked` | PASS | PASS *(via `run.py` Step 2 translator)* | PASS | PASS | `8099227` (step translator) |
