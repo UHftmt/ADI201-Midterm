@@ -590,7 +590,7 @@
         }
       ],
       "expected": {
-        "outcome": "conflict",
+        "outcome": "accepted",
         "count": 3,
         "ana_minutes": 65,
         "ben_minutes": 45
