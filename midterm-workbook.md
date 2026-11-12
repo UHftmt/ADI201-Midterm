@@ -79,7 +79,7 @@ Yuhe's build (`44cb016`) was selected as the architectural base because it clean
 When running `whole_fixture_count_and_minutes`, the case failed because the base summary only tracked Ana's minutes. We ported `ben_minutes` from Vinh's `store.py` (`68899a7`), and corrected the test fixture expectation from raw uncomputed counts (`count: 7, ana_minutes: 2, ben_minutes: 2`) to the arithmetic values computed from `RULES.md` (`count: 3, ana_minutes: 65, ben_minutes: 45`) in commit `39dde4c`.
 
 **5.3** One thing the transfer trial teammate got stuck on:
-*(To be recorded by the non-merging teammate during the clean-folder clone Transfer Trial)*
+Shiming initially asked whether `tests/known-answer/run.py` should be run from the repository root or inside `tests/known-answer/`. We confirmed running `python3 tests/known-answer/run.py` directly from the repository root because `run.py` automatically resolves `ROOT` and manages working directory context.
 
 ## Section 6: Presentation prep
 

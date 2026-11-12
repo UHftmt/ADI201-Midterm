@@ -41,4 +41,4 @@ Write your prediction **before** running. A case that fails only because a compo
 
 *Vinh's "merged, before porting" columns were run on Nov 11 with his first answers (`2051420`). He re-worked them by hand on Nov 12; the "own build" and "after porting" columns use the re-worked file.*
 
-**Transfer trial** *(pending — to be completed by a teammate who did not do the merge after Step 6)*
+**Transfer trial** (tested by Shiming in a clean directory): time taken 8 minutes; commands run 3 (`git clone`, `pip install -r requirements.txt`, `python3 tests/known-answer/run.py`); what they had to ask: whether to run `run.py` from repository root or inside `tests/known-answer/`; README fixed: explicitly verified repository root command in `README.md`.
