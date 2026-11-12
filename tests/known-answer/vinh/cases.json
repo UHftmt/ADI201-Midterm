@@ -38,7 +38,7 @@
         "outcome": "accepted",
         "state": "completed"
       },
-      "how_computed": "9:00am + 45m = 9:45am. Full lifecycle: booked -> confirmed -> arrived -> completed."
+      "how_computed": "Because it's the process. The service is not overlap with any other services, for the service to be completed it has to be confirmed, customer must arrive and then completed."
     },
     {
       "name": "client_cannot_confirm",
@@ -66,7 +66,7 @@
         "outcome": "not_permitted",
         "state": "booked"
       },
-      "how_computed": "Only staff role can confirm an appointment; client move is rejected as not_permitted and state stays booked."
+      "how_computed": "Because only the staff can confirm the booking so the service from the client's end still showing booked."
     },
     {
       "name": "client_cannot_mark_arrived",
@@ -100,7 +100,7 @@
         "outcome": "not_permitted",
         "state": "confirmed"
       },
-      "how_computed": "Only staff can mark arrived; state stays confirmed."
+      "how_computed": "The staff move the booking to confirmed and the client cannot mark arrived since they don't have the authority to do it."
     },
     {
       "name": "client_cannot_mark_no_show",
@@ -134,7 +134,7 @@
         "outcome": "not_permitted",
         "state": "confirmed"
       },
-      "how_computed": "Only staff can mark no_show; state stays confirmed."
+      "how_computed": "Only the staff can mark no-show if any customer did not make it to the Salon after confirmed the service."
     },
     {
       "name": "client_cannot_mark_completed",
@@ -174,7 +174,7 @@
         "outcome": "not_permitted",
         "state": "arrived"
       },
-      "how_computed": "Because only the staff can mark complete; state stays arrived."
+      "how_computed": "Because only the staff can mark complete because the staff is the one in charge for that."
     },
     {
       "name": "client_can_cancel_own_booking",
@@ -202,7 +202,7 @@
         "outcome": "accepted",
         "state": "cancelled"
       },
-      "how_computed": ""
+      "how_computed": "Because if the client no longer wanted the servic, they can cancel it before the staff confirmed the services."
     },
     {
       "name": "staff_marks_no_show",
@@ -236,7 +236,7 @@
         "outcome": "accepted",
         "state": "no_show"
       },
-      "how_computed": ""
+      "how_computed": "Because the staff have the authority to mark no-show if the staff don't see the customer arrive on time."
     },
     {
       "name": "staff_cannot_skip_to_completed",
@@ -264,7 +264,7 @@
         "outcome": "illegal_move",
         "state": "booked"
       },
-      "how_computed": "Staff cannot jump from booked directly to completed; illegal move transition."
+      "how_computed": "Cannot skip to complete if the service did not go from booked-confirmed-arrived-completed."
     },
     {
       "name": "completed_cannot_be_cancelled",
@@ -309,7 +309,7 @@
       "expected": {
         "outcome": "illegal_move"
       },
-      "how_computed": ""
+      "how_computed": "You cannot cancel a completed service."
     },
     {
       "name": "duplicate_request_id",
@@ -341,7 +341,7 @@
       "expected": {
         "outcome": "duplicate_request"
       },
-      "how_computed": ""
+      "how_computed": "Cannot have the same booking id."
     },
     {
       "name": "back_to_back_is_not_a_conflict",
@@ -374,7 +374,7 @@
         "outcome": "accepted",
         "state": "booked"
       },
-      "how_computed": ""
+      "how_computed": "No services conflicted."
     },
     {
       "name": "ends_exactly_at_close",
@@ -396,7 +396,7 @@
         "outcome": "accepted",
         "state": "booked"
       },
-      "how_computed": ""
+      "how_computed": "The finish time will be exactly the closing time."
     },
     {
       "name": "seeded_bad_date_format",
@@ -417,7 +417,7 @@
       "expected": {
         "outcome": "after_close"
       },
-      "how_computed": ""
+      "how_computed": "Because the service takes 30 minutes, if the service starts from 16:45 then it will finish at 17:15 which is after closing hour."
     },
     {
       "name": "seeded_after_close",
@@ -438,7 +438,7 @@
       "expected": {
         "outcome": "after_close"
       },
-      "how_computed": ""
+      "how_computed": "Because the service takes 30 minutes, if the service starts from 16:45 then it will finish at 17:15 which is after closing hour."
     },
     {
       "name": "seeded_conflict_ana",
@@ -470,7 +470,7 @@
       "expected": {
         "outcome": "conflict"
       },
-      "how_computed": ""
+      "how_computed": "The 2nd service conflict with the first one because for the first serviced to be finished it has to be at 11:00."
     },
     {
       "name": "seeded_conflict_ben",
@@ -502,7 +502,7 @@
       "expected": {
         "outcome": "conflict"
       },
-      "how_computed": "B-004 takes Ben 09:30 to 10:15; B-006 overlaps at 10:00 causing conflict."
+      "how_computed": "Ben already has a service before."
     },
     {
       "name": "whole_fixture_count_and_minutes",
@@ -590,12 +590,12 @@
         }
       ],
       "expected": {
-        "outcome": "accepted",
+        "outcome": "conflict",
         "count": 3,
         "ana_minutes": 65,
         "ben_minutes": 45
       },
-      "how_computed": "3 accepted bookings (B-001, B-003, B-004); Ana: 45 + 20 = 65 min; Ben: 45 min."
+      "how_computed": "Ana has 2 bookings: B-001 and B-003\nBen has 2 bookings: B-004 because one is in wrong date format, one is conflict."
     },
     {
       "name": "restart_keeps_bookings_and_state",
@@ -629,7 +629,7 @@
         "outcome": "accepted",
         "count": 1
       },
-      "how_computed": ""
+      "how_computed": "Even if the app is restarted, it should save the last service and the count of service."
     }
   ]
 }
