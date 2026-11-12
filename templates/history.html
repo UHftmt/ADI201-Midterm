@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Audit History | Salon & Clinic{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Audit History Log</h2>
+  <p style="color: #64748b; font-size: 0.95rem;">
+    Immutable append-only record of every create, state change, and rejected action (newest first).
+  </p>
+</div>
+
+<div class="card">
+  {% if rows %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Timestamp</th>
+          <th>Actor</th>
+          <th>Request ID</th>
+          <th>Old State</th>
+          <th>New State</th>
+          <th>Outcome</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td>#{{ r.id }}</td>
+            <td>{{ r.timestamp }}</td>
+            <td><strong>{{ r.actor }}</strong></td>
+            <td>{{ r.request_id or '—' }}</td>
+            <td>
+              {% if r.old_state %}
+                <span class="badge badge-{{ r.old_state }}">{{ r.old_state }}</span>
+              {% else %}
+                <span style="color: #94a3b8;">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.new_state %}
+                <span class="badge badge-{{ r.new_state }}">{{ r.new_state }}</span>
+              {% else %}
+                <span style="color: #94a3b8;">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.outcome == 'accepted' %}
+                <span style="color: #16a34a; font-weight: 600;">accepted</span>
+              {% else %}
+                <span style="color: #dc2626; font-weight: 600;">{{ r.outcome }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p style="color: #64748b; font-style: italic;">No audit events recorded yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

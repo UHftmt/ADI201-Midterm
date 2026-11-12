@@ -69,6 +69,20 @@ def staff():
     return render_template("staff.html", pending=pending, active=active, history=history)
 
 
+@app.route("/staff/history")
+def staff_history():
+    conn = get_db_connection(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, timestamp, actor, request_id, old_state, new_state, outcome
+        FROM audit_log
+        ORDER BY id DESC
+    """)
+    rows = cur.fetchall()
+    conn.close()
+    return render_template("history.html", rows=rows)
+
+
 @app.route("/staff/action", methods=["POST"])
 def staff_action():
     appt_id = int(request.form.get("appt_id"))
