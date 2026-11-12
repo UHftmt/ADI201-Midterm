@@ -35,10 +35,10 @@
         }
       ],
       "expected": {
-        "outcome": "illegal_move",
-        "state": "confirmed"
+        "outcome": "accepted",
+        "state": "completed"
       },
-      "how_computed": "9:00am + 45m = 9:45am"
+      "how_computed": "9:00am + 45m = 9:45am. Full lifecycle: booked -> confirmed -> arrived -> completed."
     },
     {
       "name": "client_cannot_confirm",
@@ -63,10 +63,10 @@
         }
       ],
       "expected": {
-        "outcome": "duplicate_request",
-        "state": "confirmed"
+        "outcome": "not_permitted",
+        "state": "booked"
       },
-      "how_computed": ""
+      "how_computed": "Only staff role can confirm an appointment; client move is rejected as not_permitted and state stays booked."
     },
     {
       "name": "client_cannot_mark_arrived",
@@ -98,9 +98,9 @@
       ],
       "expected": {
         "outcome": "not_permitted",
-        "state": "arrived"
+        "state": "confirmed"
       },
-      "how_computed": ""
+      "how_computed": "Only staff can mark arrived; state stays confirmed."
     },
     {
       "name": "client_cannot_mark_no_show",
@@ -132,9 +132,9 @@
       ],
       "expected": {
         "outcome": "not_permitted",
-        "state": "no_show"
+        "state": "confirmed"
       },
-      "how_computed": ""
+      "how_computed": "Only staff can mark no_show; state stays confirmed."
     },
     {
       "name": "client_cannot_mark_completed",
@@ -172,9 +172,9 @@
       ],
       "expected": {
         "outcome": "not_permitted",
-        "state": "completed"
+        "state": "arrived"
       },
-      "how_computed": "Because only the staff can mark complete because the staff is the one in charge for that."
+      "how_computed": "Because only the staff can mark complete; state stays arrived."
     },
     {
       "name": "client_can_cancel_own_booking",
@@ -261,9 +261,10 @@
         }
       ],
       "expected": {
-        "outcome": "not_permitted"
+        "outcome": "illegal_move",
+        "state": "booked"
       },
-      "how_computed": ""
+      "how_computed": "Staff cannot jump from booked directly to completed; illegal move transition."
     },
     {
       "name": "completed_cannot_be_cancelled",
@@ -479,6 +480,17 @@
           "do": "create",
           "as": "client",
           "data": {
+            "request_id": "B-004",
+            "client": "client-d",
+            "service_id": "S1",
+            "stylist": "Ben",
+            "start": "2026-11-02 09:30"
+          }
+        },
+        {
+          "do": "create",
+          "as": "client",
+          "data": {
             "request_id": "B-006",
             "client": "client-f",
             "service_id": "S2",
@@ -490,7 +502,7 @@
       "expected": {
         "outcome": "conflict"
       },
-      "how_computed": ""
+      "how_computed": "B-004 takes Ben 09:30 to 10:15; B-006 overlaps at 10:00 causing conflict."
     },
     {
       "name": "whole_fixture_count_and_minutes",
@@ -578,12 +590,12 @@
         }
       ],
       "expected": {
-        "outcome": "",
-        "count": 7,
-        "ana_minutes": 2,
-        "ben_minutes": 2
+        "outcome": "accepted",
+        "count": 3,
+        "ana_minutes": 65,
+        "ben_minutes": 45
       },
-      "how_computed": ""
+      "how_computed": "3 accepted bookings (B-001, B-003, B-004); Ana: 45 + 20 = 65 min; Ben: 45 min."
     },
     {
       "name": "restart_keeps_bookings_and_state",
