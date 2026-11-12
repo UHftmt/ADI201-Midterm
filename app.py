@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from database import init_db, get_db_connection
-from domain import create_appointment, move_appointment
+from domain import create_appointment, move_appointment, reschedule_appointment
 
 ROOT_DIR = Path(__file__).resolve().parent
 DB_PATH = ROOT_DIR / "appointments.db"
@@ -114,6 +114,23 @@ def staff_action():
         flash(f"Appointment updated to '{to_state}'.", "success")
     else:
         flash(f"Action rejected: {result['outcome']}", "error")
+
+    return redirect(url_for("staff"))
+
+
+@app.route("/staff/reschedule", methods=["POST"])
+def staff_reschedule():
+    appt_id = int(request.form.get("appt_id"))
+    new_stylist = request.form.get("new_stylist", "").strip()
+    new_start = request.form.get("new_start", "").strip()
+
+    result = reschedule_appointment(
+        DB_PATH, actor="staff", appt_id=appt_id, new_stylist=new_stylist, new_start_str=new_start
+    )
+    if result["outcome"] == "accepted":
+        flash(f"Appointment #{appt_id} rescheduled to {new_start} with {new_stylist}.", "success")
+    else:
+        flash(f"Reschedule rejected: {result['outcome']}", "error")
 
     return redirect(url_for("staff"))
 

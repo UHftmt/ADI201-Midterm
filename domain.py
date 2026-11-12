@@ -19,6 +19,7 @@ ALLOWED_TRANSITIONS = {
     ("confirmed", "arrived"): {"staff"},
     ("arrived", "completed"): {"staff"},
     ("confirmed", "no_show"): {"staff"},
+    ("booked", "no_show"): {"staff"},  # Ported from Shiming's status transitions
     ("booked", "cancelled"): {"client", "staff"},
     ("confirmed", "cancelled"): {"client", "staff"},
 }
@@ -170,6 +171,83 @@ def move_appointment(db_path, actor, appt_id, to_state):
 
     log_audit(db_path, actor, request_id, current_state, to_state, "accepted")
     return {"outcome": "accepted", "state": to_state}
+
+
+def reschedule_appointment(db_path, actor, appt_id, new_stylist, new_start_str):
+    """Reschedule an active appointment to a new stylist and/or start time.
+    
+    Ported from Shiming's frontdesk move feature (/frontdesk/<id>/move).
+    """
+    if actor != "staff":
+        return {"outcome": "not_permitted"}
+
+    conn = get_db_connection(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id, request_id, client, service_id, stylist, start_time, end_time, state FROM appointments WHERE id = ?",
+        (appt_id,)
+    )
+    appt = cur.fetchone()
+    if not appt:
+        conn.close()
+        return {"outcome": "invalid_request"}
+
+    if appt["state"] not in ("booked", "confirmed"):
+        conn.close()
+        return {"outcome": "illegal_move"}
+
+    if not new_start_str or not DATE_REGEX.match(new_start_str):
+        conn.close()
+        log_audit(db_path, actor, appt["request_id"], appt["state"], appt["state"], "bad_date_format")
+        return {"outcome": "bad_date_format"}
+
+    try:
+        start_dt = datetime.strptime(new_start_str, "%Y-%m-%d %H:%M")
+    except ValueError:
+        conn.close()
+        log_audit(db_path, actor, appt["request_id"], appt["state"], appt["state"], "bad_date_format")
+        return {"outcome": "bad_date_format"}
+
+    cur.execute("SELECT minutes FROM services WHERE service_id = ?", (appt["service_id"],))
+    svc = cur.fetchone()
+    if not svc:
+        conn.close()
+        return {"outcome": "invalid_request"}
+    end_dt = start_dt + timedelta(minutes=svc["minutes"])
+
+    open_dt = start_dt.replace(hour=9, minute=0, second=0, microsecond=0)
+    close_dt = start_dt.replace(hour=17, minute=0, second=0, microsecond=0)
+    if start_dt < open_dt or end_dt > close_dt:
+        conn.close()
+        log_audit(db_path, actor, appt["request_id"], appt["state"], appt["state"], "after_close")
+        return {"outcome": "after_close"}
+
+    target_stylist = new_stylist or appt["stylist"]
+    cur.execute(
+        """
+        SELECT request_id, start_time, end_time FROM appointments
+        WHERE stylist = ? AND state NOT IN ('cancelled') AND id != ?
+        """,
+        (target_stylist, appt_id)
+    )
+    for slot in cur.fetchall():
+        ex_start = datetime.strptime(slot["start_time"], "%Y-%m-%d %H:%M")
+        ex_end = datetime.strptime(slot["end_time"], "%Y-%m-%d %H:%M")
+        if max(start_dt, ex_start) < min(end_dt, ex_end):
+            conn.close()
+            log_audit(db_path, actor, appt["request_id"], appt["state"], appt["state"], "conflict")
+            return {"outcome": "conflict"}
+
+    end_str = end_dt.strftime("%Y-%m-%d %H:%M")
+    cur.execute(
+        "UPDATE appointments SET stylist = ?, start_time = ?, end_time = ? WHERE id = ?",
+        (target_stylist, new_start_str, end_str, appt_id)
+    )
+    conn.commit()
+    conn.close()
+
+    log_audit(db_path, actor, appt["request_id"], appt["state"], appt["state"], "accepted")
+    return {"outcome": "accepted", "state": appt["state"]}
 
 
 def list_appointments_summary(db_path):
