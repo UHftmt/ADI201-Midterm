@@ -83,6 +83,27 @@ def staff_history():
     return render_template("history.html", rows=rows)
 
 
+@app.route("/provider")
+def provider():
+    conn = get_db_connection(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT DISTINCT stylist FROM appointments WHERE stylist != '' ORDER BY stylist")
+    existing_stylists = [r[0] for r in cur.fetchall()]
+    all_stylists = sorted(list(set(["Ana", "Ben", "Avery", "Jordan"] + existing_stylists)))
+
+    selected_provider = request.args.get("provider", all_stylists[0] if all_stylists else "Ana")
+    cur.execute("""
+        SELECT a.id, a.request_id, a.client, a.stylist, a.start_time, a.end_time, a.state, s.name as service_name, s.minutes
+        FROM appointments a
+        JOIN services s ON a.service_id = s.service_id
+        WHERE a.stylist = ? AND a.state NOT IN ('cancelled')
+        ORDER BY a.start_time ASC
+    """, (selected_provider,))
+    appointments = cur.fetchall()
+    conn.close()
+    return render_template("provider.html", provider=selected_provider, providers=all_stylists, appointments=appointments)
+
+
 @app.route("/staff/action", methods=["POST"])
 def staff_action():
     appt_id = int(request.form.get("appt_id"))
