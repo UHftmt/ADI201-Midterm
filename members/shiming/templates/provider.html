@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Provider schedule · Juniper Studio{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">PROVIDER VIEW</p>
+  <h1>Daily schedule</h1>
+  <form class="provider-picker" method="get">
+    <label for="provider">View provider</label>
+    <select id="provider" name="provider">
+      {% for option in providers %}
+        <option value="{{ option }}" {% if option == provider %}selected{% endif %}>{{ option }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Show schedule</button>
+  </form>
+</section>
+<section>
+  <h2>{{ provider }}'s appointments</h2>
+  {% if appointments %}
+    <div class="card-list">
+      {% for appointment in appointments %}
+        <article class="panel appointment">
+          <div class="appointment-heading">
+            <h3>{{ appointment.start_at }}</h3>
+            <span class="status">{{ appointment.status }}</span>
+          </div>
+          <p>{{ appointment.service }} · {{ appointment.customer_name }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No appointments are scheduled for {{ provider }}.</p>
+  {% endif %}
+</section>
+{% endblock %}

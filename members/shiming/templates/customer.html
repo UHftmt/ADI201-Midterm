@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Book an appointment · Juniper Studio{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">CUSTOMER BOOKING</p>
+  <h1>Make time for yourself.</h1>
+  <p>Request a 30-minute appointment. The front desk will review and confirm it.</p>
+</section>
+<section class="panel narrow">
+  <h2>Request a visit</h2>
+  <form method="post">
+    <label for="customer_name">Name</label>
+    <input id="customer_name" name="customer_name" maxlength="80" required>
+
+    <label for="service">Service</label>
+    <select id="service" name="service" required>
+      {% for service in services %}<option value="{{ service }}">{{ service }}</option>{% endfor %}
+    </select>
+
+    <label for="provider">Preferred provider</label>
+    <select id="provider" name="provider" required>
+      {% for provider in providers %}<option value="{{ provider }}">{{ provider }}</option>{% endfor %}
+    </select>
+
+    <div class="field-row">
+      <div>
+        <label for="appointment_date">Date</label>
+        <input id="appointment_date" type="date" name="appointment_date" min="{{ today }}" required>
+      </div>
+      <div>
+        <label for="appointment_time">Start time</label>
+        <select id="appointment_time" name="appointment_time" required>
+          {% for hour in range(9, 17) %}
+            <option value="{{ '%02d:00'|format(hour) }}">{{ '%02d:00'|format(hour) }}</option>
+            <option value="{{ '%02d:30'|format(hour) }}">{{ '%02d:30'|format(hour) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <button type="submit">Request appointment</button>
+  </form>
+</section>
+{% endblock %}
