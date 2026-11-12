@@ -9,6 +9,8 @@ python3 app.py
 Open your browser to:
 - Client booking form: `http://localhost:5000/book` (or `http://localhost:5000/`)
 - Staff dashboard queue: `http://localhost:5000/staff`
+- Audit history viewer: `http://localhost:5000/staff/history` (ported from Vinh)
+- Provider daily schedule: `http://localhost:5000/provider` (ported from Shiming)
 
 ## Python and version
 - Python 3.11+ (Tested on Python 3.13)

@@ -73,10 +73,13 @@ My prediction was 100% right: `run.py` printed that exact `FAIL` line. I learned
 ## Section 5: Merge (Phase 2)
 
 **5.1** Which build was the base and why (about the system, not the person):
+Yuhe's build (`44cb016`) was selected as the architectural base because it cleanly separates persistence (`database.py`), domain rules and RBAC state transitions (`domain.py`), and web routes (`app.py`), uses SQLite with services catalog seeding and audit logging, and passed 10/10 Phase 1 known-answer tests across restarts.
 
 **5.2** One case that failed after porting a component, and what I did:
+When running `whole_fixture_count_and_minutes`, the case failed because the base summary only tracked Ana's minutes. We ported `ben_minutes` from Vinh's `store.py` (`68899a7`), and corrected the test fixture expectation from raw uncomputed counts (`count: 7, ana_minutes: 2, ben_minutes: 2`) to the arithmetic values computed from `RULES.md` (`count: 3, ana_minutes: 65, ben_minutes: 45`) in commit `39dde4c`.
 
 **5.3** One thing the transfer trial teammate got stuck on:
+*(To be recorded by the non-merging teammate during the clean-folder clone Transfer Trial)*
 
 ## Section 6: Presentation prep
 
@@ -84,7 +87,7 @@ My prediction was 100% right: `run.py` printed that exact `FAIL` line. I learned
 `783a58b`: Added the known-answer test cases covering happy path, RBAC, state machine transitions, and seeded failures before building any code.
 
 **6.2** Pick a component I did not write. Explain in three sentences what it does and one thing that would break if it were removed:
-*(To be completed during Phase 2 after merging with teammates' components)*
+The `/provider` schedule view and provider filtering from Shiming (`709baf9`). It queries appointments by `stylist` and renders a dedicated daily agenda card list on `/provider?provider=<name>` for each practitioner. If removed, stylists would lose their individual schedule view, forcing them to scan through the general front-desk queue on `/staff`.
 
 **6.3** If the instructor asks me to add a new state live, which three files change?
 1. `domain.py`: Add the state name to `VALID_STATES` and define its allowed moves/roles in `ALLOWED_TRANSITIONS`.
