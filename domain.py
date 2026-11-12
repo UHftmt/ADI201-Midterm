@@ -180,7 +180,7 @@ def list_appointments_summary(db_path):
     cur.execute("SELECT COUNT(*) FROM appointments WHERE state NOT IN ('cancelled')")
     count = cur.fetchone()[0]
 
-    # Calculate total minutes for Ana from accepted bookings
+    # Calculate total minutes for Ana and Ben from accepted bookings
     cur.execute(
         """
         SELECT COALESCE(SUM(s.minutes), 0)
@@ -190,11 +190,22 @@ def list_appointments_summary(db_path):
         """
     )
     ana_minutes = int(cur.fetchone()[0])
+
+    cur.execute(
+        """
+        SELECT COALESCE(SUM(s.minutes), 0)
+        FROM appointments a
+        JOIN services s ON a.service_id = s.service_id
+        WHERE a.stylist = 'Ben' AND a.state NOT IN ('cancelled')
+        """
+    )
+    ben_minutes = int(cur.fetchone()[0])
     conn.close()
 
     return {
         "outcome": "accepted",
         "count": count,
-        "ana_minutes": ana_minutes
+        "ana_minutes": ana_minutes,
+        "ben_minutes": ben_minutes,
     }
 
